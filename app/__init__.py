@@ -7,11 +7,14 @@ def create_app():
 
     # Configuration for MySQL database
     app.config['MYSQL_HOST'] = 'localhost'
-    app.config['MYSQL_USER'] = 'username'
-    app.config['MYSQL_PASSWORD'] = 'password'
-    app.config['MYSQL_DATABASE'] = 'dbname'
+    app.config['MYSQL_PORT'] = 3306
+    app.config['MYSQL_USER'] = 'root'
+    app.config['MYSQL_PASSWORD'] = '123456'
+    app.config['MYSQL_DATABASE'] = 'movie_streaming'
 
-    # Initialize database
+
+    # Initialize the database
+    from .db import init_db
     init_db(app)
 
     # Register routes

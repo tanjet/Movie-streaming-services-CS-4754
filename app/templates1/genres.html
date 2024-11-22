@@ -16,6 +16,7 @@
         {% for genre in genres %}
         <tr>
             <td>{{ genre.movieid }}</td>
+            <td>{{ genre.title }}</td>
             <td>{{ genre.movie_genre }}</td>
             <td>
                 <a href="/genres/edit/{{ genre.movieid }}/{{ genre.movie_genre }}" class="btn btn-warning btn-sm">Edit</a>

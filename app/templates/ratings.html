@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Manage Ratings</h1>
+
+<!-- Add New Rating -->
+<a href="/ratings/add" class="btn btn-primary mb-3">Add New Rating</a>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>User ID</th>
+            <th>Movie ID</th>
+            <th>Rating Score</th>
+            <th>Review</th>
+            <th>Rating Date</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for rating in ratings %}
+    <tr>
+        <td>{{ rating.userID }}</td>
+        <td>{{ rating.movieid }}</td>
+        <td>{{ rating.ratingScore }}</td>
+        <td>{{ rating.review }}</td>
+        <td>{{ rating.ratingDate }}</td>
+        <td>
+            <a href="/ratings/edit/{{ rating.movieid }}" class="btn btn-warning btn-sm">Edit</a>
+            <form action="/ratings/delete/{{ rating.movieid }}" method="POST" style="display:inline;">
+                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+            </form>
+        </td>
+    </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
