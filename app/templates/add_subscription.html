@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Add New Subscription</h1>
+<form action="/subscriptions/add" method="POST">
+    <div class="form-group">
+        <label for="userID">User:</label>
+        <select id="userID" name="userID" class="form-control" required>
+            <option value="" disabled selected>Select a user</option>
+            {% for user in users %}
+            <option value="{{ user.userID }}">{{ user.userName }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="startdate">Start Date:</label>
+        <input type="date" id="startdate" name="startdate" class="form-control" required>
+    </div>
+    <div class="form-group">
+        <label for="end_Date">End Date:</label>
+        <input type="date" id="end_Date" name="end_Date" class="form-control" required>
+    </div>
+    <div class="form-group">
+        <label for="subscription_status">Subscription Status:</label>
+        <select id="subscription_status" name="subscription_status" class="form-control" required>
+            <option value="" disabled selected>Select status</option>
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Add Subscription</button>
+</form>
+{% endblock %}

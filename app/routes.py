@@ -191,4 +191,138 @@ def delete_genre(movieid, genre):
 
 
 
+@main.route('/subscriptions')
+def list_subscriptions():  # Display a list of all Subscriptions.
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT subscription_id, userID, startdate, end_Date, subscription_status FROM subscriptions")
+    subscriptions = cursor.fetchall()
+    return render_template('subscriptions.html', subscriptions=subscriptions)
 
+@main.route('/subscriptions/add', methods=['GET', 'POST'])
+def add_subscription(): # add a new subscription to the database
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    if request.method == 'POST':
+        # Retrieve form data
+        userID = request.form['userID']
+        startdate = request.form['startdate']
+        end_date = request.form['end_Date']
+        subscription_status = request.form['subscription_status']
+
+        try:
+            # Insert the subscription into the database
+            cursor.execute("""
+                INSERT INTO subscriptions (userID, startdate, end_Date, subscription_status)
+                VALUES (%s, %s, %s, %s)
+            """, (userID, startdate, end_date, subscription_status))
+            db.commit()
+
+            # Redirect to the subscriptions list page after successful insertion
+            return redirect(url_for('main.list_subscriptions'))
+        except Exception as e:
+            db.rollback()
+            print(f"Error adding subscription: {e}")
+            return "An error occurred while adding the subscription.", 500
+
+    # Fetch users for the dropdown menu
+    cursor.execute("SELECT userID, userName FROM users")
+    users = cursor.fetchall()
+
+    # Render the add_subscription.html template for GET requests
+    return render_template('add_subscription.html', users=users)
+
+
+@main.route('/payments', methods=['GET', 'POST'])
+def list_payments(): # Display a list of payments from the database
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    # Fetch payment data
+    cursor.execute("""
+        SELECT p.payment_id, p.payment_amount, p.card_no, p.payment_date, p.payment_method, s.subscription_id
+        FROM payments p
+        JOIN subscriptions s ON p.subscription_id = s.subscription_id
+    """)
+    payments = cursor.fetchall()
+
+    # Render the payments.html template
+    return render_template('payments.html', payments=payments)
+
+@main.route('/payments/add', methods=['GET', 'POST'])
+def add_payment(): # Route to add a new payment to the database.
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    if request.method == 'POST':
+        # Get form data
+        payment_amount = request.form['payment_amount']
+        card_no = request.form['card_no']
+        payment_date = request.form['payment_date']
+        payment_method = request.form['payment_method']
+        subscription_id = request.form['subscription_id']
+
+        try:
+            # Insert data into the payments table
+            cursor.execute("""
+                INSERT INTO payments (payment_amount, card_no, payment_date, payment_method, subscription_id)
+                VALUES (%s, %s, %s, %s, %s)
+            """, (payment_amount, card_no, payment_date, payment_method, subscription_id))
+            db.commit()
+
+            # Redirect to the payments list page after success
+            return redirect(url_for('main.list_payments'))
+        except Exception as e:
+            db.rollback()
+            print(f"Error adding payment: {e}")
+            return "An error occurred while adding the payment.", 500
+
+    # Fetch subscriptions for the dropdown menu
+    cursor.execute("SELECT subscription_id FROM subscriptions")
+    subscriptions = cursor.fetchall()
+
+    # Render the add_payment.html template for GET requests
+    return render_template('add_payment.html', subscriptions=subscriptions)
+
+
+@main.route('/ratings')
+def list_ratings():  # Display a list of all ratings.
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT userID, movieid, ratingScore, review, ratingDate FROM ratings")
+
+    ratings = cursor.fetchall()
+    return render_template('ratings.html', ratings=ratings)
+
+@main.route('/ratings/add', methods=['GET', 'POST'])
+def add_rating(): # add new rating to the database.
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    if request.method == 'POST':
+        # Get form data
+        userID = request.form['userID']
+        movieID = request.form['movieID']
+        ratingScore = request.form['ratingScore']
+        review = request.form['review']
+        ratingDate = request.form['ratingDate']
+
+        # Insert data into the ratings table
+        cursor.execute("""
+            INSERT INTO ratings (userID, movieID, ratingScore, review, ratingDate)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (userID, movieID, ratingScore, review, ratingDate))
+        db.commit()
+
+        # Redirect to the ratings list page
+        return redirect(url_for('main.list_ratings'))
+
+    # Fetch users and movies for dropdowns
+    cursor.execute("SELECT userid, username FROM users")
+    users = cursor.fetchall()
+    cursor.execute("SELECT movieid, title FROM movies")
+    movies = cursor.fetchall()
+
+    # Render the add_rating.html template for GET requests
+    return render_template('add_rating.html', users=users, movies=movies)

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Reports</h1>
+
+<!-- Movies List Section -->
+<h2>Movies List</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for movie in movies %}
+        <tr>
+            <td>{{ movie.title }}</td>
+            <td>{{ movie.description }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Ratings List Section -->
+<h2>Ratings List</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Movie ID</th>
+            <th>Rating</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for rating in ratings %}
+        <tr>
+            <td>{{ rating.movieID }}</td>
+            <td>{{ rating.ratingScore }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
