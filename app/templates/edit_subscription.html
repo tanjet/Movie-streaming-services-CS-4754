@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Edit Subscription</h1>
+
+<form action="/subscriptions/edit/{{ subscription.subscription_id }}" method="POST">
+    <div class="mb-3">
+        <label for="userID" class="form-label">User ID</label>
+        <input type="text" id="userID" name="userID" class="form-control" value="{{ subscription.userID }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="startdate" class="form-label">Start Date</label>
+        <input type="date" id="startdate" name="startdate" class="form-control" value="{{ subscription.startdate }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="end_Date" class="form-label">End Date</label>
+        <input type="date" id="end_Date" name="end_Date" class="form-control" value="{{ subscription.end_Date }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="subscription_status" class="form-label">Status</label>
+        <select id="subscription_status" name="subscription_status" class="form-select" required>
+            <option value="Active" {% if subscription.subscription_status == 'Active' %}selected{% endif %}>Active</option>
+            <option value="Inactive" {% if subscription.subscription_status == 'Inactive' %}selected{% endif %}>Inactive</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-success">Update</button>
+</form>
+{% endblock %}
