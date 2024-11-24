@@ -9,7 +9,7 @@ def dashboard():
 
 
 # Movie Routes
-@main.route('/movies')
+@main.route('/movies') 
 def list_movies():
     db = get_db()
     cursor = db.cursor(dictionary=True)
@@ -99,27 +99,47 @@ def edit_user(user_id):
     db = get_db()
     cursor = db.cursor(dictionary=True)
 
+    # Fetch user data
+    cursor.execute("SELECT * FROM users WHERE userID = %s", (user_id,))
+    user = cursor.fetchone()
+
+    # Handle case where the user is not found
+    if not user:
+        return "User not found", 404
+
     if request.method == 'POST':
-        userName = request.form['userName']
-        email = request.form['email']
-        password = request.form['password']
-        date_of_birth = request.form['date_of_birth']
+        # Get data from form
+        userName = request.form.get('userName')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        date_of_birth = request.form.get('date_of_birth')
+
+        # Validate input fields
+        if not all([userName, email, password, date_of_birth]):
+            return "All fields are required", 400
+
+        # Update the user in the database
         cursor.execute(
-            "UPDATE users SET userName=%s, email=%s, password=%s, date_of_birth=%s WHERE userid=%s",
+            """
+            UPDATE users
+            SET userName = %s, email = %s, password = %s, date_of_birth = %s
+            WHERE userID = %s
+            """,
             (userName, email, password, date_of_birth, user_id)
         )
         db.commit()
         return redirect(url_for('main.list_users'))
 
-    cursor.execute("SELECT * FROM users WHERE userid = %s", (user_id,))
-    user = cursor.fetchone()
     return render_template('edit_user.html', title="Edit User", user=user)
+
+
+
 
 @main.route('/users/delete/<int:user_id>', methods=['POST'])
 def delete_user(user_id):
     db = get_db()
     cursor = db.cursor()
-    cursor.execute("DELETE FROM users WHERE userid=%s", (user_id,))
+    cursor.execute("DELETE FROM users WHERE userID=%s", (user_id,))
     db.commit()
     return redirect(url_for('main.list_users'))
 
@@ -181,15 +201,13 @@ def edit_genre(movieid, movie_genre):
 
 
 
-@main.route('/genres/delete/<int:movieid>/<string:genre>', methods=['POST'])
-def delete_genre(movieid, genre):
+@main.route('/genres/delete/<int:movieid>/<string:movie_genre>', methods=['POST'])
+def delete_genre(movieid, movie_genre):
     db = get_db()
     cursor = db.cursor()
-    cursor.execute("DELETE FROM movie_genre WHERE movieid=%s AND genre=%s", (movieid, genre))
+    cursor.execute("DELETE FROM movie_genre WHERE movieid=%s AND movie_genre=%s", (movieid, movie_genre))
     db.commit()
     return redirect(url_for('main.list_genres'))
-
-
 
 @main.route('/subscriptions')
 def list_subscriptions():  # Display a list of all Subscriptions.
@@ -233,6 +251,44 @@ def add_subscription(): # add a new subscription to the database
     # Render the add_subscription.html template for GET requests
     return render_template('add_subscription.html', users=users)
 
+@main.route('/subscriptions/edit/<int:subscription_id>', methods=['GET', 'POST'])
+def edit_subscription(subscription_id):
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    # Fetch subscription details
+    cursor.execute("SELECT * FROM subscriptions WHERE subscription_id = %s", (subscription_id,))
+    subscription = cursor.fetchone()
+
+    if not subscription:
+        return "Subscription not found", 404
+
+    if request.method == 'POST':
+        userID = request.form['userID']
+        startdate = request.form['startdate']
+        end_date = request.form['end_Date']
+        subscription_status = request.form['subscription_status']
+
+        cursor.execute(
+            """
+            UPDATE subscriptions
+            SET userID = %s, startdate = %s, end_Date = %s, subscription_status = %s
+            WHERE subscription_id = %s
+            """,
+            (userID, startdate, end_date, subscription_status, subscription_id)
+        )
+        db.commit()
+        return redirect(url_for('main.list_subscriptions'))
+
+    return render_template('edit_subscription.html', title="Edit Subscription", subscription=subscription)
+
+@main.route('/subscriptions/delete/<int:subscription_id>', methods=['POST'])
+def delete_subscription(subscription_id):
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("DELETE FROM subscriptions WHERE subscription_id = %s", (subscription_id,))
+    db.commit()
+    return redirect(url_for('main.list_subscriptions'))
 
 @main.route('/payments', methods=['GET', 'POST'])
 def list_payments(): # Display a list of payments from the database
@@ -285,6 +341,46 @@ def add_payment(): # Route to add a new payment to the database.
     # Render the add_payment.html template for GET requests
     return render_template('add_payment.html', subscriptions=subscriptions)
 
+@main.route('/payments/edit/<int:payment_id>', methods=['GET', 'POST'])
+def edit_payment(payment_id):
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    # Fetch payment details
+    cursor.execute("SELECT * FROM payments WHERE payment_id = %s", (payment_id,))
+    payment = cursor.fetchone()
+
+    if not payment:
+        return "Payment not found", 404
+
+    if request.method == 'POST':
+        payment_amount = request.form['payment_amount']
+        card_no = request.form['card_no']
+        payment_date = request.form['payment_date']
+        payment_method = request.form['payment_method']
+        subscription_id = request.form['subscription_id']
+
+        cursor.execute(
+            """
+            UPDATE payments
+            SET payment_amount = %s, card_no = %s, payment_date = %s, payment_method = %s, subscription_id = %s
+            WHERE payment_id = %s
+            """,
+            (payment_amount, card_no, payment_date, payment_method, subscription_id, payment_id)
+        )
+        db.commit()
+        return redirect(url_for('main.list_payments'))
+
+    return render_template('edit_payment.html', title="Edit Payment", payment=payment)
+
+@main.route('/payments/delete/<int:payment_id>', methods=['POST'])
+def delete_payment(payment_id):
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("DELETE FROM payments WHERE payment_id = %s", (payment_id,))
+    db.commit()
+    return redirect(url_for('main.list_payments'))
+
 
 @main.route('/ratings')
 def list_ratings():  # Display a list of all ratings.
@@ -326,3 +422,42 @@ def add_rating(): # add new rating to the database.
 
     # Render the add_rating.html template for GET requests
     return render_template('add_rating.html', users=users, movies=movies)
+
+@main.route('/ratings/edit/<int:movie_id>/<int:user_id>', methods=['GET', 'POST'])
+def edit_rating(movie_id, user_id):
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    # Fetch rating details
+    cursor.execute("SELECT * FROM ratings WHERE movieid = %s AND userID = %s", (movie_id, user_id))
+    rating = cursor.fetchone()
+
+    if not rating:
+        return "Rating not found", 404
+
+    if request.method == 'POST':
+        ratingScore = request.form['ratingScore']
+        review = request.form['review']
+        ratingDate = request.form['ratingDate']
+
+        cursor.execute(
+            """
+            UPDATE ratings
+            SET ratingScore = %s, review = %s, ratingDate = %s
+            WHERE movieid = %s AND userID = %s
+            """,
+            (ratingScore, review, ratingDate, movie_id, user_id)
+        )
+        db.commit()
+        return redirect(url_for('main.list_ratings'))
+
+    return render_template('edit_rating.html', title="Edit Rating", rating=rating)
+
+
+@main.route('/ratings/delete/<int:movie_id>/<int:user_id>', methods=['POST'])
+def delete_rating(movie_id, user_id):
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("DELETE FROM ratings WHERE movieid = %s AND userID = %s", (movie_id, user_id))
+    db.commit()
+    return redirect(url_for('main.list_ratings'))
