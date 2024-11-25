@@ -461,3 +461,69 @@ def delete_rating(movie_id, user_id):
     cursor.execute("DELETE FROM ratings WHERE movieid = %s AND userID = %s", (movie_id, user_id))
     db.commit()
     return redirect(url_for('main.list_ratings'))
+
+
+@main.route('/reports')
+def reports():
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    # Query for Active vs. Inactive Users
+    cursor.execute("""
+        SELECT subscription_status, COUNT(*) AS total_users
+        FROM subscriptions
+        GROUP BY subscription_status;
+    """)
+    active_inactive_users = cursor.fetchall()
+
+    # Query for Revenue from Subscriptions
+    cursor.execute("""
+        SELECT SUM(payment_amount) AS total_revenue
+        FROM payments;
+    """)
+    revenue_from_subscriptions = cursor.fetchone()['total_revenue']
+
+    # Query for Top-Rated Movies
+    cursor.execute("""
+        SELECT m.title, ROUND(AVG(r.ratingScore), 2) AS avg_rating, COUNT(r.ratingScore) AS total_ratings
+        FROM movies m
+        JOIN ratings r ON m.movieid = r.movieid
+        GROUP BY m.movieid
+        HAVING total_ratings > 5
+        ORDER BY avg_rating DESC
+        LIMIT 10;
+    """)
+    top_rated_movies = cursor.fetchall()
+
+    # Query for Top Movies by Genre (limit 5 per genre)
+    cursor.execute("""
+        SELECT mg.movie_genre, m.title, ROUND(AVG(r.ratingScore), 2) AS avg_rating
+        FROM movie_genre mg
+        JOIN movies m ON mg.movieid = m.movieid
+        JOIN ratings r ON m.movieid = r.movieid
+        GROUP BY mg.movie_genre, m.movieid
+        ORDER BY mg.movie_genre, avg_rating DESC;
+    """)
+    top_movies_by_genre_raw = cursor.fetchall()
+
+    # Organize and limit top movies by genre
+    top_movies_by_genre = {}
+    for row in top_movies_by_genre_raw:
+        genre = row['movie_genre']
+        movie = {'title': row['title'], 'avg_rating': row['avg_rating']}
+        if genre not in top_movies_by_genre:
+            top_movies_by_genre[genre] = []
+        if len(top_movies_by_genre[genre]) < 5:  # Limit to 5 movies per genre
+            top_movies_by_genre[genre].append(movie)
+
+    # Close connection
+    cursor.close()
+    db.close()
+
+    return render_template(
+        'reports.html',
+        active_inactive_users=active_inactive_users,
+        revenue_from_subscriptions=revenue_from_subscriptions,
+        top_rated_movies=top_rated_movies,
+        top_movies_by_genre=top_movies_by_genre
+    )
