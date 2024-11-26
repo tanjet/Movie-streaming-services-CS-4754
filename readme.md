@@ -1,8 +1,8 @@
 
-# Movie Streaming Service Application by Group 1
+# Movie Streaming Service Application by Group 1- COMP4754
 
 ## Project Description and Purpose
-This project, developed by Group 1 of COM4754, is a comprehensive database and web application that simulates the operations of a movie streaming service. It runs on local server, with the frontend built using HTML and the backend powered by Python (using Flask), and MySQL for the Database. The application is designed to provide seamless CRUD (Create, Retrieve, Update, Delete) functionality for managing users, movies, genres, ratings, subscriptions, and payments. This application features live server-side integration, which allows users to modify the database directly from the frontend interface. This enables efficient interaction with the database while ensuring real-time updates and consistency across the system.
+This is a comprehensive database and web application that simulates the operations of a movie streaming service. It runs on local server, with the frontend built using HTML and the backend powered by Python (using Flask), and MySQL for the Database. The application is designed to provide seamless CRUD (Create, Retrieve, Update, Delete) functionality for managing users, movies, genres, ratings, subscriptions, and payments. This application features live server-side integration, which allows users to modify the database directly from the frontend interface. This enables efficient interaction with the database while ensuring real-time updates and consistency across the system.
 
 ---
 
