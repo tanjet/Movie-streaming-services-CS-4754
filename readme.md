@@ -145,15 +145,15 @@ The database schema consists of the following main tables:
 ---
 
 ## How to Use the Project
-1. Intuitive design in the front-end you'll find yourself in Dashboard.
+1. Intuitive design in the front end you'll find yourself in the Dashboard.
 2. Access the relevant tabs from the navigation bar for CRUD operations on users, movies, genres, payments, ratings and subscriptions.
 2. Navigate to the reports section to generate reports (under development)
-3. Test user interactions by adding, removing or edditing data using the buttons and HTML forms.
+3. Test user interactions by adding, removing or editing data using the buttons and HTML forms.
 
 ---
 
 ## Contributors
-- Project developed collaboratively by Group 1 as part of the COMP-4754 Database Systems course. <be>
+This Project is developed by Group 1 as part of the COMP-4754 Database Systems course. <br>
 **Group Members:**
 
 - Jason Wheeler <br>
