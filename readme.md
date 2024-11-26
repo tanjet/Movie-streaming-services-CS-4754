@@ -81,7 +81,7 @@ Movie-Streaming-Application/
 - `/subscriptions`, `/subscriptions/add`, `/subscriptions/edit/<subscriptionID>`, `/subscriptions/delete/<subscriptionID>`: For Viewing subscriptions list, status, adding, editing and deleting subscriptions
 - `/payments`, `/payments/add`, `/payments/edit/<paymentID>`, `/payments/delete/<paymentID>`: For Viewing, adding, editing and deleting payments
 - `/ratings`, `/ratings/add`, `/ratings/edit/<movieID><userID>`, `/ratings/delete/<movieID><userID>`: For Viewing, adding, editing and deleting ratings
--`/reports` : For showing a comprehensive report of the database (currently under development)
+- `/reports` : For showing a comprehensive report of the database (currently under development)
 
 ---
 
