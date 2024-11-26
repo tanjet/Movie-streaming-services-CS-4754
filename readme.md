@@ -15,7 +15,7 @@ This project, developed by Group 1 of COM4754, is a comprehensive database and w
 6. [How to Install and Run the Project](#how-to-install-and-run-the-project)
 7. [How to Use the Project](#how-to-use-the-project)
 8. [Contributors](#contributors)
-9. [Future Development](#future-development)
+9. [Future Development](#future-development-Thoughts)
 
 ---
 
