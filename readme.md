@@ -153,15 +153,16 @@ The database schema consists of the following main tables:
 ---
 
 ## Contributors
-- Project developed collaboratively by Group 1 as part of the COMP-4754 Database Systems course.
-**Members:**
+- Project developed collaboratively by Group 1 as part of the COMP-4754 Database Systems course. <be>
+**Group Members:**
+
+- Jason Wheeler <br>
+ID: 202018057 <br>
+Email: jwheeler@mun.ca
+
 - Md. Zubayer Ahmed <br>
 ID: 202160438 <br>
 Email: mzahmed@mun.ca
-
-- Jason Wheeler <br>
-ID: 2020---- <br>
-Email: jwheeler@mun.ca
 
 - Tanjet Tanjet <br>
 ID: 2021---- <br>
