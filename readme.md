@@ -170,8 +170,6 @@ Email: ttanjet@mun.ca
 ---
 
 ## Future Development Thoughts
-- Implement user authentication with role-based access control.
-- Improve the front-end with advanced UI/UX features.
-- Add more complex analytics in the reports section.
-- Integrate real-time payment gateways for transaction management.
-- Expand the database to include additional entities like promotional offers and customer support records.
+- Implementation of the DashBoard, Report Page and a Query page so the user can do their own queries from the front-end
+- Implementation of user authentication with role-based access control.
+- Expanding the database attributes, integrity and functionalities, add triggers, procedures, SQL functions and transactions
