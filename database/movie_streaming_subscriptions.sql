@@ -1,3 +1,5 @@
+CREATE DATABASE  IF NOT EXISTS `movie_streaming` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `movie_streaming`;
 -- MySQL dump 10.13  Distrib 8.0.38, for macos14 (x86_64)
 --
 -- Host: 127.0.0.1    Database: movie_streaming
@@ -31,7 +33,7 @@ CREATE TABLE `subscriptions` (
   PRIMARY KEY (`subscription_id`),
   KEY `userID` (`userID`),
   CONSTRAINT `subscriptions_ibfk_1` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -40,6 +42,7 @@ CREATE TABLE `subscriptions` (
 
 LOCK TABLES `subscriptions` WRITE;
 /*!40000 ALTER TABLE `subscriptions` DISABLE KEYS */;
+INSERT INTO `subscriptions` VALUES (1,1,'2024-02-11','2024-05-11','Active'),(2,1,'2024-02-11','2024-05-11','Active'),(3,1,'2024-02-11','2024-05-11','Active'),(4,1,'2024-02-11','2024-05-11','Active');
 /*!40000 ALTER TABLE `subscriptions` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -52,4 +55,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-11-17 22:08:53
+-- Dump completed on 2024-11-28 19:50:05
