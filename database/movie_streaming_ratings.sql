@@ -1,3 +1,5 @@
+CREATE DATABASE  IF NOT EXISTS `movie_streaming` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `movie_streaming`;
 -- MySQL dump 10.13  Distrib 8.0.38, for macos14 (x86_64)
 --
 -- Host: 127.0.0.1    Database: movie_streaming
@@ -42,7 +44,7 @@ CREATE TABLE `ratings` (
 
 LOCK TABLES `ratings` WRITE;
 /*!40000 ALTER TABLE `ratings` DISABLE KEYS */;
-INSERT INTO `ratings` VALUES (1,1,3,'It is a good movie','2001-12-19');
+INSERT INTO `ratings` VALUES (1,1,3,'It is a good movie','2001-12-19'),(2,1,1,'It is a wow movie','2001-12-19'),(3,1,5,'It is a beautifulmovie','2001-12-19'),(4,1,1,'It is a good movie','2001-12-19'),(5,1,5,'It is a good movie','2001-12-19'),(6,1,2,'It is a good movie','2001-12-19'),(7,1,3,'It is a good movie','2001-12-19'),(8,1,3,'It is a good movie','2001-12-19');
 /*!40000 ALTER TABLE `ratings` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -55,4 +57,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-11-17 22:08:53
+-- Dump completed on 2024-11-28 19:50:04
