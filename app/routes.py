@@ -12,7 +12,46 @@ main = Blueprint('main', __name__)
 
 @main.route('/')
 def dashboard():
-    return render_template('dashboard.html', title="Admin Dashboard")
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    # Total Users
+    cursor.execute("SELECT COUNT(*) AS total_users FROM users")
+    total_users = cursor.fetchone()['total_users']
+
+    # Monthly Revenue
+    cursor.execute("""
+        SELECT SUM(payment_amount) AS monthly_revenue 
+        FROM payments 
+        WHERE MONTH(payment_date) = MONTH(CURDATE())
+    """)
+    monthly_revenue = cursor.fetchone()['monthly_revenue']
+
+    # Total Subscriptions
+    cursor.execute("SELECT COUNT(*) AS total_subscriptions FROM subscriptions")
+    total_subscriptions = cursor.fetchone()['total_subscriptions']
+
+    # Most Reviewed Movie
+    cursor.execute("""
+        SELECT m.title, COUNT(r.movieid) AS review_count
+        FROM movies m
+        JOIN ratings r ON m.movieid = r.movieid
+        GROUP BY m.movieid
+        ORDER BY review_count DESC
+        LIMIT 1
+    """)
+    most_reviewed_movie = cursor.fetchone()
+
+    cursor.close()
+    db.close()
+
+    return render_template('dashboard.html', 
+                           total_users=total_users, 
+                           monthly_revenue=monthly_revenue, 
+                           total_subscriptions=total_subscriptions,
+                           most_reviewed_movie=most_reviewed_movie)
+
+
 
 
 # Movie Routes
@@ -78,7 +117,11 @@ def delete_movie(movie_id):
 def list_users():
     db = get_db()
     cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT userid, userName, email, password, date_of_birth FROM users")
+    cursor.execute("""
+        SELECT userid, userName, email, date_of_birth
+        FROM users
+        ORDER BY userid DESC;  -- Sort by userID in descending order (newest first)
+    """)
     users = cursor.fetchall()
     return render_template('users.html', title="Users", users=users)
 
@@ -109,6 +152,10 @@ def edit_user(user_id):
     # Fetch user data
     cursor.execute("SELECT * FROM users WHERE userID = %s", (user_id,))
     user = cursor.fetchone()
+
+    # Debugging output to verify fetched data
+    print(f"User ID from URL: {user_id}")
+    print(f"Fetched User from Database: {user}")
 
     # Handle case where the user is not found
     if not user:
@@ -141,14 +188,25 @@ def edit_user(user_id):
 
 
 
-
 @main.route('/users/delete/<int:user_id>', methods=['POST'])
 def delete_user(user_id):
     db = get_db()
     cursor = db.cursor()
-    cursor.execute("DELETE FROM users WHERE userID=%s", (user_id,))
-    db.commit()
-    return redirect(url_for('main.list_users'))
+
+    try:
+        # Delete associated ratings first
+        cursor.execute("DELETE FROM ratings WHERE userID = %s", (user_id,))
+
+        # Now delete the user
+        cursor.execute("DELETE FROM users WHERE userID = %s", (user_id,))
+        db.commit()
+
+        return redirect(url_for('main.list_users'))
+    except Exception as e:
+        db.rollback()
+        print(f"Error deleting user: {e}")
+        return "An error occurred while deleting the user.", 500
+
 
 
 # Genre Routes
@@ -293,9 +351,21 @@ def edit_subscription(subscription_id):
 def delete_subscription(subscription_id):
     db = get_db()
     cursor = db.cursor()
-    cursor.execute("DELETE FROM subscriptions WHERE subscription_id = %s", (subscription_id,))
-    db.commit()
-    return redirect(url_for('main.list_subscriptions'))
+
+    try:
+        # Delete related payments first
+        cursor.execute("DELETE FROM payments WHERE subscription_id = %s", (subscription_id,))
+        
+        # Now delete the subscription
+        cursor.execute("DELETE FROM subscriptions WHERE subscription_id = %s", (subscription_id,))
+        db.commit()
+
+        return redirect(url_for('main.list_subscriptions'))
+    except Exception as e:
+        db.rollback()
+        print(f"Error deleting subscription: {e}")
+        return "An error occurred while deleting the subscription.", 500
+
 # Payment Routes
 @main.route('/payments')
 def list_payments():
@@ -336,6 +406,7 @@ def edit_payment(payment_id):
 def delete_payment_route(payment_id):
     delete_payment(payment_id)
     return redirect(url_for('main.list_payments'))
+
 
 
 @main.route('/ratings')
@@ -417,3 +488,69 @@ def delete_rating(movie_id, user_id):
     cursor.execute("DELETE FROM ratings WHERE movieid = %s AND userID = %s", (movie_id, user_id))
     db.commit()
     return redirect(url_for('main.list_ratings'))
+
+@main.route('/reports')
+def reports():
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    # Query for Active vs. Inactive Users
+    cursor.execute("""
+        SELECT subscription_status, COUNT(*) AS total_users
+        FROM subscriptions
+        GROUP BY subscription_status;
+    """)
+    active_inactive_users = cursor.fetchall()
+
+    # Query for Revenue from Subscriptions
+    cursor.execute("""
+        SELECT SUM(payment_amount) AS total_revenue
+        FROM payments;
+    """)
+    revenue_from_subscriptions = cursor.fetchone()['total_revenue']
+
+    # Query for Top-Rated Movies
+    cursor.execute("""
+        SELECT m.title, ROUND(AVG(r.ratingScore), 2) AS avg_rating, COUNT(r.ratingScore) AS total_ratings
+        FROM movies m
+        JOIN ratings r ON m.movieid = r.movieid
+        GROUP BY m.movieid
+        HAVING total_ratings > 5
+        ORDER BY avg_rating DESC
+        LIMIT 10;
+    """)
+    top_rated_movies = cursor.fetchall()
+
+    # Query for Top Movies by Genre (limit 5 per genre)
+    cursor.execute("""
+        SELECT mg.movie_genre, m.title, ROUND(AVG(r.ratingScore), 2) AS avg_rating
+        FROM movie_genre mg
+        JOIN movies m ON mg.movieid = m.movieid
+        JOIN ratings r ON m.movieid = r.movieid
+        GROUP BY mg.movie_genre, m.movieid
+        ORDER BY mg.movie_genre, avg_rating DESC;
+    """)
+    top_movies_by_genre_raw = cursor.fetchall()
+
+    # Organize and limit top movies by genre
+    top_movies_by_genre = {}
+    for row in top_movies_by_genre_raw:
+        genre = row['movie_genre']
+        movie = {'title': row['title'], 'avg_rating': row['avg_rating']}
+        if genre not in top_movies_by_genre:
+            top_movies_by_genre[genre] = []
+        if len(top_movies_by_genre[genre]) < 5:  # Limit to 5 movies per genre
+            top_movies_by_genre[genre].append(movie)
+
+    # Close connection
+    cursor.close()
+    db.close()
+
+    return render_template(
+        'reports.html',
+        active_inactive_users=active_inactive_users,
+        revenue_from_subscriptions=revenue_from_subscriptions,
+        top_rated_movies=top_rated_movies,
+        top_movies_by_genre=top_movies_by_genre
+    )
+

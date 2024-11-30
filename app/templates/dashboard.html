@@ -1,6 +1,53 @@
-{% extends "base.html" %}
-
-{% block content %}
+{% extends "base.html" %} {% block content %}
 <h1>Welcome to the Admin Dashboard</h1>
 <p>Use the navigation bar to manage the main entities or view Reports.</p>
+
+<div class="container mt-4">
+  <h2 class="text-center mb-4">Key Metrics</h2>
+  <div class="row">
+    <!-- Total Users -->
+    <div class="col-md-3">
+      <div class="card text-white bg-primary mb-3">
+        <div class="card-header">Total Users</div>
+        <div class="card-body">
+          <h5 class="card-title">{{ total_users }}</h5>
+        </div>
+      </div>
+    </div>
+
+    <!-- Monthly Revenue -->
+    <div class="col-md-3">
+      <div class="card text-white bg-success mb-3">
+        <div class="card-header">Monthly Revenue</div>
+        <div class="card-body">
+          <h5 class="card-title">${{ monthly_revenue }}</h5>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total Subscriptions -->
+    <div class="col-md-3">
+      <div class="card text-white bg-info mb-3">
+        <div class="card-header">Total Subscriptions</div>
+        <div class="card-body">
+          <h5 class="card-title">{{ total_subscriptions }}</h5>
+        </div>
+      </div>
+    </div>
+
+    <!-- Most Reviewed Movie -->
+    <div class="col-md-3">
+      <div class="card text-white bg-warning mb-3">
+        <div class="card-header">Most Reviewed Movie</div>
+        <div class="card-body">
+          <h5 class="card-title">{{ most_reviewed_movie['title'] }}</h5>
+          <p class="card-text">
+            {{ most_reviewed_movie['review_count'] }} reviews
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}

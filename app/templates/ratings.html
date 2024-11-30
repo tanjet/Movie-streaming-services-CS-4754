@@ -1,37 +1,42 @@
-{% extends "base.html" %}
-
-{% block content %}
+{% extends "base.html" %} {% block content %}
 <h1>Ratings</h1>
 <a href="/ratings/add" class="btn btn-primary mb-3">Add Rating</a>
 
 <table class="table">
-    <thead>
-        <tr>
-            <th>Movie ID</th>
-            <th>User ID</th>
-            <th>Rating Score</th>
-            <th>Review</th>
-            <th>Rating Date</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for rating in ratings %}
-        <tr>
-            <td>{{ rating.movieid }}</td>
-            <td>{{ rating.userID }}</td>
-            <td>{{ rating.ratingScore }}</td>
-            <td>{{ rating.review }}</td>
-            <td>{{ rating.ratingDate }}</td>
-            <td>
-                <a href="/ratings/edit/{{ rating.movieid }}/{{ rating.userID }}" class="btn btn-warning btn-sm">Edit</a>
-                <form action="/ratings/delete/{{ rating.movieid }}/{{ rating.userID }}" method="POST" style="display:inline;">
-                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
+  <thead>
+    <tr>
+      <th>Movie ID</th>
+      <th>User ID</th>
+      <th>Rating Score</th>
+      <th>Review</th>
+      <th>Rating Date</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for rating in ratings %}
+    <tr>
+      <td>{{ rating.movieid }}</td>
+      <td>{{ rating.userID }}</td>
+      <td>{{ rating.ratingScore }}</td>
+      <td>{{ rating.review }}</td>
+      <td>{{ rating.ratingDate }}</td>
+      <td>
+        <a
+          href="/ratings/edit/{{ rating.movieid }}/{{ rating.userID }}"
+          class="btn btn-warning btn-sm"
+          >Edit</a
+        >
+        <form
+          action="/ratings/delete/{{ rating.movieid }}/{{ rating.userID }}"
+          method="POST"
+          style="display: inline"
+        >
+          <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
 </table>
 {% endblock %}
-
