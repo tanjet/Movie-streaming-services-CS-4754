@@ -165,8 +165,8 @@ ID: 202160438 <br>
 Email: mzahmed@mun.ca
 
 - Tanjet Tanjet <br>
-ID: 2021---- <br>
-Email: ttanjet@mun.ca
+ID: 202174678 <br>
+Email: tanjett@mun.ca
 
 ---
 
