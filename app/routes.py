@@ -1,6 +1,13 @@
 from flask import Blueprint, request, render_template, redirect, url_for
 from .db import get_db
-
+from .queries import (
+    get_all_payments,
+    add_payment,
+    get_payment_by_id,
+    update_payment,
+    delete_payment,
+    get_all_subscriptions
+)
 main = Blueprint('main', __name__)
 
 @main.route('/')
@@ -289,96 +296,45 @@ def delete_subscription(subscription_id):
     cursor.execute("DELETE FROM subscriptions WHERE subscription_id = %s", (subscription_id,))
     db.commit()
     return redirect(url_for('main.list_subscriptions'))
-
-@main.route('/payments', methods=['GET', 'POST'])
-def list_payments(): # Display a list of payments from the database
-    db = get_db()
-    cursor = db.cursor(dictionary=True)
-
-    # Fetch payment data
-    cursor.execute("""
-        SELECT p.payment_id, p.payment_amount, p.card_no, p.payment_date, p.payment_method, s.subscription_id
-        FROM payments p
-        JOIN subscriptions s ON p.subscription_id = s.subscription_id
-    """)
-    payments = cursor.fetchall()
-
-    # Render the payments.html template
-    return render_template('payments.html', payments=payments)
+# Payment Routes
+@main.route('/payments')
+def list_payments():
+    payments = get_all_payments()
+    return render_template('payments.html', title="Payments", payments=payments)
 
 @main.route('/payments/add', methods=['GET', 'POST'])
-def add_payment(): # Route to add a new payment to the database.
-    db = get_db()
-    cursor = db.cursor(dictionary=True)
-
+def add_payment_route():
     if request.method == 'POST':
-        # Get form data
         payment_amount = request.form['payment_amount']
         card_no = request.form['card_no']
         payment_date = request.form['payment_date']
         payment_method = request.form['payment_method']
-        subscription_id = request.form['subscription_id']
+        subscription_id = request.form['subscription_id']  # User-selected ID from form
+        add_payment(payment_amount, card_no, payment_date, payment_method, subscription_id)
 
-        try:
-            # Insert data into the payments table
-            cursor.execute("""
-                INSERT INTO payments (payment_amount, card_no, payment_date, payment_method, subscription_id)
-                VALUES (%s, %s, %s, %s, %s)
-            """, (payment_amount, card_no, payment_date, payment_method, subscription_id))
-            db.commit()
-
-            # Redirect to the payments list page after success
-            return redirect(url_for('main.list_payments'))
-        except Exception as e:
-            db.rollback()
-            print(f"Error adding payment: {e}")
-            return "An error occurred while adding the payment.", 500
-
-    # Fetch subscriptions for the dropdown menu
-    cursor.execute("SELECT subscription_id FROM subscriptions")
-    subscriptions = cursor.fetchall()
-
-    # Render the add_payment.html template for GET requests
-    return render_template('add_payment.html', subscriptions=subscriptions)
+        return redirect(url_for('main.list_payments'))
+    
+    # Fetch all subscription IDs for the dropdown
+    subscriptions = get_all_subscriptions()
+    return render_template('add_payment.html', title="Add Payment", subscriptions=subscriptions)
 
 @main.route('/payments/edit/<int:payment_id>', methods=['GET', 'POST'])
 def edit_payment(payment_id):
-    db = get_db()
-    cursor = db.cursor(dictionary=True)
-
-    # Fetch payment details
-    cursor.execute("SELECT * FROM payments WHERE payment_id = %s", (payment_id,))
-    payment = cursor.fetchone()
-
-    if not payment:
-        return "Payment not found", 404
-
     if request.method == 'POST':
         payment_amount = request.form['payment_amount']
         card_no = request.form['card_no']
         payment_date = request.form['payment_date']
         payment_method = request.form['payment_method']
         subscription_id = request.form['subscription_id']
-
-        cursor.execute(
-            """
-            UPDATE payments
-            SET payment_amount = %s, card_no = %s, payment_date = %s, payment_method = %s, subscription_id = %s
-            WHERE payment_id = %s
-            """,
-            (payment_amount, card_no, payment_date, payment_method, subscription_id, payment_id)
-        )
-        db.commit()
+        update_payment(payment_id, payment_amount, card_no, payment_date, payment_method, subscription_id)
         return redirect(url_for('main.list_payments'))
 
+    payment = get_payment_by_id(payment_id)
     return render_template('edit_payment.html', title="Edit Payment", payment=payment)
 
 @main.route('/payments/delete/<int:payment_id>', methods=['POST'])
-def delete_payment(payment_id):
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute("DELETE FROM payments WHERE payment_id = %s", (payment_id,))
-    db.commit()
+def delete_payment_route(payment_id):
+    delete_payment(payment_id)
     return redirect(url_for('main.list_payments'))
 
 

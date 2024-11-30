@@ -3,11 +3,11 @@ from flask import g
 
 def get_db():
     if 'db' not in g:
-        g.db = mysql.connector.connect(
-            host='localhost',
-            user='username',
-            password='password',
-            database='dbname'
+       g.db = mysql.connector.connect(
+    host='Tanjets-MacBook-Air.local',
+    user='root',
+    password='Tanjid12*',
+    database='movie_streaming'
         )
     return g.db
 
