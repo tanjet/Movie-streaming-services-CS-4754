@@ -1,43 +1,97 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Reports</h1>
+<div class="container mt-4">
+    <h1 class="text-center mb-5">Reports</h1>
 
-<!-- Movies List Section -->
-<h2>Movies List</h2>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>Description</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for movie in movies %}
-        <tr>
-            <td>{{ movie.title }}</td>
-            <td>{{ movie.description }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+    <!-- Active vs. Inactive Users -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2>Active vs. Inactive Users</h2>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Subscription Status</th>
+                        <th>Total Users</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in active_inactive_users %}
+                    <tr>
+                        <td>{{ row.subscription_status }}</td>
+                        <td>{{ row.total_users }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-<!-- Ratings List Section -->
-<h2>Ratings List</h2>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Movie ID</th>
-            <th>Rating</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for rating in ratings %}
-        <tr>
-            <td>{{ rating.movieID }}</td>
-            <td>{{ rating.ratingScore }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+    <!-- Revenue from Subscriptions -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2>Revenue from Subscriptions</h2>
+        </div>
+        <div class="card-body">
+            <p class="lead"><strong>Total Revenue:</strong> ${{ revenue_from_subscriptions }}</p>
+        </div>
+    </div>
+
+    <!-- Top-Rated Movies -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2>Top-Rated Movies</h2>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Average Rating</th>
+                        <th>Total Ratings</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for movie in top_rated_movies %}
+                    <tr>
+                        <td>{{ movie.title }}</td>
+                        <td>{{ movie.avg_rating }}</td>
+                        <td>{{ movie.total_ratings }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Top Movies by Genre -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2>Top Movies by Genre</h2>
+        </div>
+        <div class="card-body">
+            {% for genre, movies in top_movies_by_genre.items() %}
+            <h3 class="mt-4">{{ genre }}</h3>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Average Rating</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for movie in movies %}
+                    <tr>
+                        <td>{{ movie.title }}</td>
+                        <td>{{ movie.avg_rating }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endfor %}
+        </div>
+    </div>
+</div>
 {% endblock %}
