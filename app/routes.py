@@ -5,7 +5,46 @@ main = Blueprint('main', __name__)
 
 @main.route('/')
 def dashboard():
-    return render_template('dashboard.html', title="Admin Dashboard")
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    # Total Users
+    cursor.execute("SELECT COUNT(*) AS total_users FROM users")
+    total_users = cursor.fetchone()['total_users']
+
+    # Monthly Revenue
+    cursor.execute("""
+        SELECT SUM(payment_amount) AS monthly_revenue 
+        FROM payments 
+        WHERE MONTH(payment_date) = MONTH(CURDATE())
+    """)
+    monthly_revenue = cursor.fetchone()['monthly_revenue']
+
+    # Total Subscriptions
+    cursor.execute("SELECT COUNT(*) AS total_subscriptions FROM subscriptions")
+    total_subscriptions = cursor.fetchone()['total_subscriptions']
+
+    # Most Reviewed Movie
+    cursor.execute("""
+        SELECT m.title, COUNT(r.movieid) AS review_count
+        FROM movies m
+        JOIN ratings r ON m.movieid = r.movieid
+        GROUP BY m.movieid
+        ORDER BY review_count DESC
+        LIMIT 1
+    """)
+    most_reviewed_movie = cursor.fetchone()
+
+    cursor.close()
+    db.close()
+
+    return render_template('dashboard.html', 
+                           total_users=total_users, 
+                           monthly_revenue=monthly_revenue, 
+                           total_subscriptions=total_subscriptions,
+                           most_reviewed_movie=most_reviewed_movie)
+
+
 
 
 # Movie Routes
@@ -71,7 +110,11 @@ def delete_movie(movie_id):
 def list_users():
     db = get_db()
     cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT userid, userName, email, password, date_of_birth FROM users")
+    cursor.execute("""
+        SELECT userid, userName, email, date_of_birth
+        FROM users
+        ORDER BY userid DESC;  -- Sort by userID in descending order (newest first)
+    """)
     users = cursor.fetchall()
     return render_template('users.html', title="Users", users=users)
 
@@ -102,6 +145,10 @@ def edit_user(user_id):
     # Fetch user data
     cursor.execute("SELECT * FROM users WHERE userID = %s", (user_id,))
     user = cursor.fetchone()
+
+    # Debugging output to verify fetched data
+    print(f"User ID from URL: {user_id}")
+    print(f"Fetched User from Database: {user}")
 
     # Handle case where the user is not found
     if not user:
@@ -134,14 +181,25 @@ def edit_user(user_id):
 
 
 
-
 @main.route('/users/delete/<int:user_id>', methods=['POST'])
 def delete_user(user_id):
     db = get_db()
     cursor = db.cursor()
-    cursor.execute("DELETE FROM users WHERE userID=%s", (user_id,))
-    db.commit()
-    return redirect(url_for('main.list_users'))
+
+    try:
+        # Delete associated ratings first
+        cursor.execute("DELETE FROM ratings WHERE userID = %s", (user_id,))
+
+        # Now delete the user
+        cursor.execute("DELETE FROM users WHERE userID = %s", (user_id,))
+        db.commit()
+
+        return redirect(url_for('main.list_users'))
+    except Exception as e:
+        db.rollback()
+        print(f"Error deleting user: {e}")
+        return "An error occurred while deleting the user.", 500
+
 
 
 # Genre Routes
@@ -286,9 +344,21 @@ def edit_subscription(subscription_id):
 def delete_subscription(subscription_id):
     db = get_db()
     cursor = db.cursor()
-    cursor.execute("DELETE FROM subscriptions WHERE subscription_id = %s", (subscription_id,))
-    db.commit()
-    return redirect(url_for('main.list_subscriptions'))
+
+    try:
+        # Delete related payments first
+        cursor.execute("DELETE FROM payments WHERE subscription_id = %s", (subscription_id,))
+        
+        # Now delete the subscription
+        cursor.execute("DELETE FROM subscriptions WHERE subscription_id = %s", (subscription_id,))
+        db.commit()
+
+        return redirect(url_for('main.list_subscriptions'))
+    except Exception as e:
+        db.rollback()
+        print(f"Error deleting subscription: {e}")
+        return "An error occurred while deleting the subscription.", 500
+
 
 @main.route('/payments', methods=['GET', 'POST'])
 def list_payments(): # Display a list of payments from the database
