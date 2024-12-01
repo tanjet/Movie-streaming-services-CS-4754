@@ -35,6 +35,8 @@ Movie-Streaming-Application/
 ├── app/
 │   ├── __init__.py                         # Initializes the Flask app
 │   ├── routes.py                           # Defines API endpoints and routing
+│   ├── queries.py                          # Stores and executes the SQL Queries (as per demo feedback)
+│   ├── db.py                               # Manages database connections
 │   ├── templates/
 │   |   ├── base.html                       # Base layout used across all templates 
 │   |   ├── dashboard.html                  # Admin dashboard page 
@@ -57,7 +59,6 @@ Movie-Streaming-Application/
 │   |   ├── add_rating.html                 # Form to add a new rating 
 │   |   ├── edit_rating.html                # Form to edit an existing rating 
 │   |   ├── ratings.html                    # Page to list and manage ratings
-│   ├── db.py                               # Manages database connections and queries
 ├── database/
 |   ├── movie_streaming_users.sql           # SQL script for users tables 
 |   ├── movie_streaming_movies.sql          # SQL script for movies tables 
@@ -65,9 +66,11 @@ Movie-Streaming-Application/
 |   ├── movie_streaming_ratings.sql         # SQL script for ratings tables 
 |   ├── movie_streaming_payments.sql        # SQL script for payments tables 
 |   ├── movie_streaming_subscriptions.sql   # SQL script for subscriptions tables
+├── Documents/
+|   ├── Group1-Phase1.pdf                       # Phase-1 submission of the project (Project Overview)
+|   ├── Group1-Phase2.pdf                       # Phase-2 submission (ERD, Relational Schema, and Normalization)
+|   ├── project-Report.pdf                      # Final Project Report
 ├── run.py                                  # Main application entry point
-├── Group1-Phase1.pdf                       # Phase-1 submission of the project (Project Overview)
-├── Group1-Phase2.pdf                       # Phase-2 submission of the project (ERD, Relational Schema, and Normalization)
 ├── readme.md                               # This file
 ```
 
