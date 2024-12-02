@@ -4,9 +4,9 @@ from flask import g
 def get_db():
     if 'db' not in g:
         g.db = mysql.connector.connect(
-    host='Tanjets-MacBook-Air.local',
+    host='localhost',
     user='root',
-    password='Tanjid12*',
+    password='123456',
     database='movie_streaming'
         )
     return g.db
