@@ -9,7 +9,7 @@ def create_app():
     app.config['MYSQL_HOST'] = 'localhost'
     app.config['MYSQL_USER'] = 'username'
     app.config['MYSQL_PASSWORD'] = 'password'
-    app.config['MYSQL_DATABASE'] = 'dbname'
+    app.config['MYSQL_DATABASE'] = 'movie_streaming'
 
     # Initialize database
     init_db(app)
