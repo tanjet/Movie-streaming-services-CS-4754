@@ -20,12 +20,12 @@ This is a comprehensive database and web application that simulates the operatio
 ---
 
 ## Key Functionalities and Features
-- **Dashboard**: The main page of the server, shows the key metrics, data, and operations related to the database (under development)
+- **Dashboard**: The main page of the server, shows the key metrics related to the database
 - **User Management**: View, Add, edit, and delete user records.
 - **Movies and Genres**: Manage a comprehensive database of movies and their associated genres.
 - **Ratings and Reviews**: Enable users to add, edit, and view ratings for movies.
 - **Subscriptions and Payments**: Track and manage user subscriptions and payment history.
-- **Reports**: Generate reports and execute complex queries on the database. (under development)
+- **Reports**: Generate reports and execute complex queries on the database.
 
 ---
 
@@ -174,6 +174,6 @@ Email: tanjett@mun.ca
 ---
 
 ## Future Development Thoughts
-- Implementation of the DashBoard, Report Page and a Query page so the user can do their own queries from the front-end
+- Implementation of a Query page so the user can do their own queries from the front-end
 - Implementation of user authentication with role-based access control.
-- Expanding the database attributes, integrity and functionalities, add triggers, procedures, SQL functions and transactions
+- Expanding the database attributes, integrity and functionalities.
